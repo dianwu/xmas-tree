@@ -1,0 +1,83 @@
+$green1:#224433;
+$green2:#229522;
+$green3:#126215;
+$red1:#9d2330;
+
+@function mod ($a, $b){
+    @return $a - (floor($a / $b)) * $b
+}
+
+@mixin xmas-tree($level:3) {
+    // 頂端
+    $treeBorder: $level+"em 0em 0 0 "+$green1;
+    
+    // 根
+    $treeBorder: $treeBorder + 
+        ", "+ ($level)     + "em " + ($level + 2) +"em 0 0 " + $green2 +
+        ", "+ ($level - 1) + "em " + ($level + 3) +"em 0 0 " + $green1 +
+        ", "+  $level      + "em " + ($level + 3) +"em 0 0 " + $green1 +
+        ", "+ ($level + 1) + "em " + ($level + 3) +"em 0 0 " + $green1;
+    
+    $divNum: 4;
+    $offset:0;
+    @for $y from 1 to $level {
+        $offset: 2 * floor($y / $divNum);
+        $left:  $level - $y + $offset;
+        $right: $level + $y - $offset;
+
+        $treeBorder: $treeBorder +
+                    ", "+ $left  + "em " + $y + "em 0 0 " + $green1 +
+                    ", "+ $right + "em " + $y + "em 0 0 " + $green1 ;
+                    ", "+ $y + "em " + ($level + 1) +"em 0 0 " + $green1 ;
+        
+        // 中間綠色
+        @for $j from ($left + 1) to $right - 1 {
+            @if $y > $divNum - 1 {
+                @if $y + 1 > $level {
+                    $treeBorder: $treeBorder + ", "+ $j + "em " + $y +"em 0 0 " + $green2;    
+                }@else if mod($j, 2) == mod($y, 2){
+                    $treeBorder: $treeBorder + ", "+ $j + "em " + $y +"em 0 0 " + $green3; 
+                }@else{
+                    $treeBorder: $treeBorder + ", "+ $j + "em " + $y +"em 0 0 " + $green2;  
+                }
+            }else{
+                $treeBorder: $treeBorder + ", "+ $j + "em " + $y +"em 0 0 " + $green2;    
+            }
+        }
+    }
+    // 收底
+    $offset: 2 * floor($level/ $divNum);
+    $left:  $level  - 1 - $offset;
+    $right: ($level * 2) - 1 - $offset;
+    $treeBorder: $treeBorder + ", "+ $left + "em " + ($level + 1) +"em 0 0 " + $green1;
+    $treeBorder: $treeBorder + ", "+ $right + "em " + ($level + 1) +"em 0 0 " + $green1;
+    $treeBorder: $treeBorder + ", "+ ($left + 1) + "em " + ($level + 2) +"em 0 0 " + $green1;
+    $treeBorder: $treeBorder + ", "+ ($right - 1) + "em " + ($level + 2) +"em 0 0 " + $green1;
+    @for $x from $left + 1 to $right - 1 {
+        $treeBorder: $treeBorder + ", "+ ($x) + "em " + ($level + 1) +"em 0 0 " + $green2;
+        $treeBorder: $treeBorder + ", "+ ($x) + "em " + ($level + 2) +"em 0 0 " + $green1;
+    }
+    box-shadow: #{$treeBorder};
+}
+@-webkit-keyframes light {
+    0%   { box-shadow: 0 0 0 0 $green2,inset 0 0 0 1em $green2}
+    25%  { box-shadow: 0 0 20px 1px yellow,inset 0 0 0 1em yellow}
+    50%  { box-shadow: 0 0 0   0 $green2,inset 0 0 0 1em $green2}
+    100% { box-shadow: 0 0 20px 2px blue,inset 0 0 0 1em blue}
+}
+.xmas-tree{
+    margin-top:5em;
+    width:1em;
+    height:1em;
+    @include xmas-tree(10); // 10層
+}
+.xmas-tree::after{
+    width:1em;
+    height:1em;
+    content: " ";
+    display: block;
+    //-webkit-animation: light 5s infinite;
+}
+html {
+    background-color:#000;
+}
